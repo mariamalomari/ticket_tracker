@@ -7,7 +7,6 @@ require_once "../controllers/LoginController.php";
 $loginController = new LoginController();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id = $_POST["id"];
     $email = $_POST["email"];
     $password = $_POST["password"];
 

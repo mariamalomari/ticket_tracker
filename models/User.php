@@ -35,27 +35,35 @@ class User extends dbHandler {
 
     //returns false if either email is not found or if password is wrong
     public function verifyCombination($email, $password) {
-        $query = "SELECT password FROM users WHERE email = ?;";
-        $stmt = $this->connect()->prepare($query);
         
-        if (!$stmt->execute([$email])) {
-            $stmt = null;
-            return false;
-        } 
-
-        if ($stmt->rowCount() == 0) {
-            $stmt = null; //why do we do this??
+    
+        $user = $this->getUserInfoByEmail($email);
+        if (!$user) {
             return false;
         }
 
-        $dbHashedPassword = $stmt->fetch(PDO::FETCH_ASSOC);
+        $dbHashedPassword = $user["password"];
 
-        if (password_verify($password, $dbHashedPassword["password"])) { //not 100% sure if this should be done here in the model or in the controller
+        if (password_verify($password, $dbHashedPassword)) { //not 100% sure if this should be done here in the model or in the controller
             return true;
         } else {
             return false;
         }
 
+    }
+
+    public function getUserInfoByEmail($email) {
+        $query = "SELECT * FROM users WHERE email = ?;";
+        $stmt = $this->connect()->prepare($query);
+        $stmt->execute([$email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserInfoByID($user_id) {
+        $query = "SELECT * FROM users WHERE id = ?;";
+        $stmt = $this->connect()->prepare($query);
+        $stmt->execute([$user_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
 

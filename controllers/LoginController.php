@@ -20,6 +20,8 @@ class LoginController {
 
         $userModel = new User();
         if ($userModel->verifyCombination($email, $password)) {
+            $userID = $userModel->getUserInfoByEmail($email)["id"];
+            $_SESSION["user_id"] = $userID;
             header("Location: ../public/dashboard.php");
             exit();
         } else {

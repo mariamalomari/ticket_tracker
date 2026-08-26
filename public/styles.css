@@ -1,0 +1,41 @@
+.sidebar {
+    width: 200px;
+    background-color: #F3E7F0;
+}
+
+.sidebar a {
+    display: block;
+    padding: 16px;
+    text-decoration: none; /*to remove link underlines*/
+    flex-direction: row
+
+}
+
+.sidebar a:hover:not(.active) {
+    background-color: #E8D5E4;
+}
+
+.sidebar a.active {
+    background-color: #DCC1D7;
+}
+body {
+    display: flex; /* to avoid sidebar and navbar from overlapping*/
+    flex-direction: column; /* makes main content and navbar stacked on top of each other */
+    min-height: 100vh;
+    background-color: #fffbfd;
+}
+
+.main-body { /* to make the sidebar and the main content side by side */
+    display: flex;
+    flex-direction: row;
+    flex: 1; /*fills entire screen space*/
+}
+
+.main-content {
+    padding-left: 5%;
+    flex-grow: 1;
+}
+
+label , h2, p{
+    color: #300028;
+}

@@ -1,8 +1,0 @@
-CREATE TABLE users (
-    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    username VARCHAR(30) NOT NULL,
-    password VARCHAR(100) NOT NULL,
-    PRIMARY KEY (id)
-)
-
-

@@ -13,8 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $signupController->registerUser($email, $password, $repeatedPassword);
 
-    header("Location: ../dashboard.php");
-
 } else if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $error = $_GET["error"] ?? null;
     $signupController->showSignupPage($error);
