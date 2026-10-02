@@ -2,54 +2,32 @@
 
 require_once "../session_config.php"; //we require cookies only in public entrypoints
 
-require_once "../controllers/DashboardController.php";
+require_once "../controllers/TicketController.php";
 
-//authentication before accessing anything
-if(!isset($_SESSION["user_id"])) {
-    header("Location: login.php");
-    exit;
-}
-
+requireAuth();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") { 
     //POST request happens when deleting a ticket
-    $DashboardController = new DashboardController();
-    
-    $filter = [
-        "title" => $_GET["titleSearch"] ?? null,
-        "category" => $_GET["category"] ?? null,
-        "status" => $_GET["status"] ?? null,
-        "priority" => $_GET["priority"] ?? null,
-    ];
-
-    $message = null;
-
-    //so when we reload we dont try to redelete it
-    if ($DashboardController->deleteTicket($_POST["ticketIdToDelete"])) {
+    $ticketController = new TicketController();
+ 
+    //so when we reload we dont try to redelete it --> header
+    $deleting_status = $ticketController->deleteTicket($_POST);
+    if ($deleting_status == "successfully_deleted") {
         header("Location: allTickets.php?success=successfully_deleted");
     } else {
-        header("Location: allTickets.php?error=error_deleting");
+        header("Location: allTickets.php?error=" . $deleting_status);
     }
-
     exit();
 
 } else {
-    $DashboardController = new DashboardController();
+    $ticketController = new TicketController();
 
-    $filter = [
-        "search" => $_GET["search"] ?? null,
-        "project_id" => $_GET["project_id"] ?? null,
-        "title" => $_GET["titleSearch"] ?? null,
-        "category" => $_GET["category"] ?? null,
-        "status" => $_GET["status"] ?? null,
-        "priority" => $_GET["priority"] ?? null,
-    ];
-
-    if (isset($_GET["error"]) || isset($_GET["success"])) {
+     if (isset($_GET["error"]) || isset($_GET["success"])) {
         $message = $_GET["error"] ?? $_GET["success"];
-        $DashboardController->showAllTicketsPage($filter, $message);
+        $ticketController->showAllTicketsPage($_GET, $message);
     } else {
-        $DashboardController->showAllTicketsPage($filter);
+        $ticketController->showAllTicketsPage($_GET);
 
     }
+
 }

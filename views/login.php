@@ -16,6 +16,7 @@
     <div class="container p-5 border rounded-3 container-lg mx-auto shadow" style="max-width: 500px; background-color: #ffffff;">
         <h2 class="text-center fw-bold mb-3" style="color: #300028;">Login</h2>
         <form action="../public/login.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
             <div class="mb-3">
                 <label class="form-label" style="color: #300028;">Email: </label>    
                 <input type="email" name="email" class="form-control" required>

@@ -39,3 +39,6 @@ PHP sessions manage authenticated state across pages and automaticallly redirect
     php -S localhost:8000 -t public
     ```
     - Access the application in the browser at: http://localhost:8000/login.php
+
+
+update about admin thingy

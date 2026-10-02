@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <!-- bootstrap css file -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous" defer></script>
-    <!--css-->
-    <link rel="stylesheet" type="text/css" href="styles.css">
+<?php 
+$pageTitle = "Dashboard";
+$activePage = "dashboard"; //for sidebar
+require_once 'partials/header.php';
+require_once 'partials/navbar.php'; 
+?>
+
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const ticketCreationForm = document.getElementById('ticketCreationForm');
@@ -32,70 +29,31 @@
             })
         })
     </script>
-</head>
-<body>
-    <!--navbar-->
-    <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: #300028;"> <!-- horizontal navbar that becomes vertica on small screens-->
-        <div class="container-fluid"> <!-- container for paddings -->
-            <a class="navbar-brand" href="#">Ticket Tracker</a>     
-            <ul class="navbar-nav">
-                <!--Projects Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href="#">Projects</a> <!-- dropdown button -->
-                    <ul class="dropdown-menu">
-                        <a class="dropdown-item text-decoration-none" href="../public/allTickets.php">All Projects</a>
-                        <?php 
-                            foreach ($allProjectNames as $project):
-                        ?>
-                        <a class="dropdown-item text-decoration-none" href="../public/allTickets.php?project_id=<?php echo $project['id'] ?>"><?php echo $project['name']?></a>
-                        <?php endforeach; ?>
-                    </ul>
-                </li>
-                <!--Search-->
-                <li class="nav-item">
-                    <form action="../public/allTickets.php" method="GET" class="input-group">
-                        <input class="form-control" type="search" placeholder="Search" name="search">
-                        <button type="submit" class="btn btn-secondary">Submit</button>
-                    </form>
-                </li>
-                <!--Profile Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href="#">Profile</a> <!-- dropdown button -->
-                    <ul class="dropdown-menu">
-                        <a class="dropdown-item" href="../public/profile.php">Profile</a>
-                        <a class="dropdown-item" href="../public/logout.php">Logout</a>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </nav>
+
 
 
     <div class="main-body">
         <!--sidebar-->
-        <div class="sidebar">
-            <a href="../public/dashboard.php" style="color: #300028;" class="active">Dashboard</a>
-            <a href="../public/allTickets.php" style="color: #300028;">All Tickets</a>
-            <a href="../public/myTickets.php" style="color: #300028;">My Tickets</a>
-        </div>
+        <?php require_once 'partials/sidebar.php'; ?>
+
         <div class="main-content">
             <div class="card p-5 m-5 border shadow">
                 <div class="row text-center">
                     <div class="col-md-4">
                         <div>
-                            <h2 class="number fw-bold"><?php echo $openTicketsNumber ?? 0 ?></h2>
+                            <h2 class="number fw-bold"><?php echo htmlspecialchars($openTicketsNumber ?? 0) ?></h2>
                             <p class="label">OPEN TICKETS</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div>
-                            <h2 class="number fw-bold"><?php echo $myTicketsNumber ?? 0?></h2>
+                            <h2 class="number fw-bold"><?php echo htmlspecialchars($myTicketsNumber ?? 0)?></h2>
                             <p class="label">MY ACTIVE TICKETS</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div>
-                            <h2 class="number fw-bold"><?php echo $highPriorityTicketsNumber  ?? 0 ?></h2>
+                            <h2 class="number fw-bold"><?php echo htmlspecialchars($highPriorityTicketsNumber ?? 0) ?></h2>
                             <p class="label">HIGH PRIORITY TICKETS</p>
                         </div>
                     </div>
@@ -109,15 +67,16 @@
                 <div id="jsError" class="alert alert-danger py-2 d-none"></div>
 
                 <?php if ($messageOutput): ?>
-                    <div class="alert alert-<?php echo $color ?>"><?php echo $messageOutput ?></div>
+                    <div class="alert alert-<?php echo htmlspecialchars($color) ?>"><?php echo htmlspecialchars($messageOutput) ?></div>
                 <?php endif; ?>
                 <form action="../public/dashboard.php" method="POST" id="ticketCreationForm">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                     <label class="form-label">Project: </label>
                     <select name="project_id" class="form-select" required>
                         <?php 
                             foreach ($allProjectNames as $project):
                         ?>
-                        <option value="<?php echo $project['id']?>"><?php echo $project['name']?></option>
+                        <option value="<?php echo htmlspecialchars($project['id'])?>"><?php echo htmlspecialchars($project['name'])?></option>
                         <?php endforeach; ?>
                     </select>
 

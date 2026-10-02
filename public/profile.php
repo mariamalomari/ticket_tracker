@@ -5,10 +5,7 @@ require_once "../session_config.php"; //we require cookies only in public entryp
 require_once "../controllers/DashboardController.php";
 
 //authentication before accessing anything
-if(!isset($_SESSION["user_id"])) {
-    header("Location: login.php");
-    exit;
-}
+requireAuth();
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") { //create new ticket form submitted

@@ -1,14 +1,13 @@
 .sidebar {
     width: 200px;
     background-color: #F3E7F0;
+    
 }
 
 .sidebar a {
     display: block;
     padding: 16px;
     text-decoration: none; /*to remove link underlines*/
-    flex-direction: row
-
 }
 
 .sidebar a:hover:not(.active) {
@@ -38,4 +37,15 @@ body {
 
 label , h2, p{
     color: #300028;
+}
+
+/* for small screens*/
+@media (max-width: 768px) {
+    .main-body { 
+        flex-direction: column; /* sidebar becomes on top */
+    }
+    .sidebar { 
+        width: 100%; /* expands the sidebar from a fixed 200px column to the entire screen width*/
+        display: flex; /* become a single row*/
+    }
 }

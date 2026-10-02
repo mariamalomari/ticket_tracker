@@ -3,17 +3,13 @@
 require_once "../session_config.php"; //we require cookies only in public entrypoints
 
 //instantiating the class 
-require_once "../controllers/SignupController.php";
-$signupController = new SignupController();
+require_once "../controllers/AuthenticationController.php";
+$authenticationController = new AuthenticationController();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    $repeatedPassword = $_POST["repeatedPassword"];
-    
-    $signupController->registerUser($email, $password, $repeatedPassword);
+    $authenticationController->registerUser($_POST);
 
 } else if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $error = $_GET["error"] ?? null;
-    $signupController->showSignupPage($error);
+    $authenticationController->showSignupPage($error);
 } 

@@ -3,27 +3,18 @@
 require_once "../session_config.php"; //we require cookies only in public entrypoints
 
 require_once "../controllers/DashboardController.php";
+require_once "../controllers/TicketController.php";
 
-//authentication before accessing anything
-if(!isset($_SESSION["user_id"])) {
-    header("Location: login.php");
-    exit;
-}
-
+requireAuth();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") { //create new ticket form submitted
-    $project_id = $_POST["project_id"];
-    $title = $_POST["title"];
-    $description = $_POST["description"];
-    $category = $_POST["category"];
-    $priority = $_POST["priority"];
-    $status = $_POST["status"];
 
-    $DashboardController = new DashboardController();
+    $TicketController = new ticketController();
 
-    $DashboardController->createNewTicket($project_id, $_SESSION["user_id"], $title, $description, $category, $priority, $status);
+    $TicketController->createNewTicket($_POST);
 
 } else {
     $DashboardController = new DashboardController();
-    $DashboardController->showMainDashboardPage(null, $_SESSION["user_id"]);
+    $message = $_GET["error"] ?? $_GET["success"] ?? null;
+    $DashboardController->showMainDashboardPage($_SESSION["user_id"], $message);
 }
