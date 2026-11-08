@@ -6,16 +6,21 @@ class User extends dbHandler {
 
     //function to check if email used for signup is already registered
     public function alreadyRegistered($email) {
-        $query = "SELECT id FROM users WHERE email = ?;";
+        try {
+            $query = "SELECT id FROM users WHERE email = ?;";
 
-        $stmt = $this->connect()->prepare($query);
-        
-        $stmt->execute([$email]);
+            $stmt = $this->connect()->prepare($query);
+            
+            $stmt->execute([$email]);
 
-        if ($stmt->rowCount() > 0) {
-            return true;
-        } else {
-            return false;
+            if ($stmt->rowCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            error_log("User::alreadyRegistered failed: " . $e->getMessage());
+            return null;
         }
     }
 
@@ -23,14 +28,18 @@ class User extends dbHandler {
     public function addUser($email, $password) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        $query = "INSERT INTO users (email, password) VALUES (?, ?);";
-        $stmt = $this->connect()->prepare($query);
-        if (!$stmt->execute([$email, $hashedPassword])) {
-            $stmt = null;
-            return false;
-        } 
-
-        return true;
+        try{
+            $query = "INSERT INTO users (email, password) VALUES (?, ?);";
+            $stmt = $this->connect()->prepare($query);
+            if (!$stmt->execute([$email, $hashedPassword])) {
+                $stmt = null;
+                return false;
+            } 
+            return true;
+        } catch (PDOException $e) {
+            error_log("User::addUser failed: " . $e->getMessage());
+            return null;
+        }
     }
 
     //returns false if either email is not found or if password is wrong
@@ -53,17 +62,27 @@ class User extends dbHandler {
     }
 
     public function getUserInfoByEmail($email) {
-        $query = "SELECT * FROM users WHERE email = ?;";
-        $stmt = $this->connect()->prepare($query);
-        $stmt->execute([$email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $query = "SELECT * FROM users WHERE email = ?;";
+            $stmt = $this->connect()->prepare($query);
+            $stmt->execute([$email]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("User::getUserInfoByEmail failed: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function getUserInfoByID($user_id) {
-        $query = "SELECT * FROM users WHERE id = ?;";
-        $stmt = $this->connect()->prepare($query);
-        $stmt->execute([$user_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try{
+            $query = "SELECT * FROM users WHERE id = ?;";
+            $stmt = $this->connect()->prepare($query);
+            $stmt->execute([$user_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("User::getUserInfoByID failed: " . $e->getMessage());
+            return false;
+        }
     }
 
 

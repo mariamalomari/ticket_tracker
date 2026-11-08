@@ -36,7 +36,14 @@
                 $messageOutput = "CSRF token error."; //???????????
                 $color = "danger";
 
+            } else if ($message == "error_too_long") {
+                $messageOutput = "Title must be 100 characters or less.";
+                $color = "danger";
+            } else if ($message == "error_invalid_project") {
+                $messageOutput = "project you selected does not exist.";
+                $color = "danger";
             }
+
 
             require_once "../views/dashboard.php";
 
@@ -50,6 +57,10 @@
             
             $userModel = new User();
             $userInfo = $userModel->getUserInfoById($user_id);
+            if (!$userInfo) {
+            header("Location: ../public/dashboard.php?error=error");
+            exit();
+        }
             $user_email = $userInfo["email"];
             require_once "../views/profile.php";
         }

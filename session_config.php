@@ -1,6 +1,17 @@
 <?php
 //so we can just require it in every page we need cookies in instead of rewriting
 
+//hiding errors from the browser but keep them in the server logs
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
+//catch for any unhandled exceptions
+set_exception_handler(function ($e) {
+    error_log("not caught exception: " . $e->getMessage());
+    http_response_code(500);
+    exit("Something went wrong.");
+});
+
 ini_set("session.use_only_cookies", 1); //use cookies for sessionid
 ini_set("session.use_strict_mode", 1); //only accept cookies made by the server
 

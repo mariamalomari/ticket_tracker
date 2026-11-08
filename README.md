@@ -32,7 +32,8 @@ PHP sessions manage authenticated state across pages and automaticallly redirect
     CREATE DATABASE ticket_tracker_application;
     ```
 2. Import the database_setup.sql SQL schema into the ticket_tracker_application database to create the required tables which are: users, tickets and projects.
-3. Update your database connection settings in `config/db.php`.
+3. copy config/db.example.php to config/db.php and fill in your database details.
+
 4. Running locally:
     - Start PHP's built-in development server from the project directory pointing to the public/ directory:
     ```bash 

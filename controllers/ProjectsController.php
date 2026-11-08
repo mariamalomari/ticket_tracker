@@ -34,7 +34,17 @@ class ProjectsController {
         } else if ($message == "successfully_created") {
             $messageOutput = "Successfully added Project.";
             $color = "success";
+        }  else if ($message == "empty_fields") {
+            $messageOutput = "Please fill out all fields.";
+            $color = "danger";
+        } else if ($message == "error_too_long") {
+            $messageOutput = "Project name must be 100 characters or less.";
+            $color = "danger";
+        } else if ($message == "error_creating") {
+            $messageOutput = "There was an error creating the project. Please try again later.";
+            $color = "danger";
         }
+
 
 
         $projectsModel = new Projects();
@@ -52,20 +62,32 @@ class ProjectsController {
         $csrf_token = $data['csrf_token'] ?? null;
         $user_id = $_SESSION["user_id"] ?? null;
 
+        $name = is_string($data['name'] ?? null) ? trim($data['name']) : '';
+        $description = is_string($data['description'] ?? null) ? trim($data['description']) : '';
+
+
         if (!verifyCSRFtoken($csrf_token)) {
             header("Location: ../public/projects.php?error=error_csrf");
             exit(); 
         }
 
         //server-side validation for empty inputs
-        if (empty($data['name']) || empty($data['description'])) {
+        if ($name === '' || $description === '') {
             header("Location: ../public/projects.php?error=empty_fields");
+            exit();
+        }
+
+        if (mb_strlen($name) > 100) {
+            header("Location: ../public/projects.php?error=error_too_long");
             exit();
         }
 
         $projectsModel = new Projects();        
         
-        $projectsModel->addProject($data['name'], $data['description'], $user_id);
+        if (!$projectsModel->addProject($name, $description, $user_id)) {
+            header("Location: ../public/projects.php?error=error_creating");
+            exit();
+        }
 
         header("Location: ../public/projects.php?success=successfully_created");
         exit();
@@ -108,7 +130,11 @@ class ProjectsController {
         } else if ($message == "error_csrf") {
             $messageOutput = "CSRF Token failed.";
             $color = "danger";
+        } else if ($message == "error_too_long") {
+            $messageOutput = "Project name must be 100 characters or less.";
+            $color = "danger";
         }
+
 
         require_once "../views/editProject.php";
     }
@@ -120,9 +146,9 @@ class ProjectsController {
 
         $csrf_token = $data['csrf_token'] ?? null;
         $user_id = $_SESSION["user_id"] ?? null;
-        $project_id = $data["project_id"] ?? null;
-        $name = $data["name"] ?? '';
-        $description = $data["description"] ?? '';
+        $project_id = filter_var($data["project_id"] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $name = is_string($data["name"] ?? null) ? trim($data["name"]) : '';
+        $description = is_string($data["description"] ?? null) ? trim($data["description"]) : '';
         
         if (!verifyCSRFtoken($csrf_token)) {
             $this->showEditProjectPage($project_id, "error_csrf");
@@ -132,9 +158,19 @@ class ProjectsController {
         $projectsModel = new Projects();
 
         //if any field is empty via raw post
-        if (!$project_id || !$name || !$description ) {
+        if ($project_id === false || $name === '' || $description === '') {
             $this->showEditProjectPage($project_id, "edit_error_empty");
             return;
+        }
+
+        if (mb_strlen($name) > 100) {
+            $this->showEditProjectPage($project_id, "error_too_long");
+            return;
+        }
+
+        if (!$projectsModel->getProjectInfo($project_id)) {
+            header("Location: ../public/projects.php?error=not_found");
+            exit();
         }
 
         

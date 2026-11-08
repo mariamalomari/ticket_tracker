@@ -60,18 +60,29 @@ class TicketController {
         }
 
         //csrf verified
-        $project_id = $data["project_id"] ?? null;
-        $title = $data["title"] ?? '';
-        $description = $data["description"] ?? '';
-        $category = $data["category"] ?? '';
-        $priority = $data["priority"] ?? '';
-        $status = $data["status"] ?? '';
+        $project_id = filter_var($data["project_id"] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $title = is_string($data["title"] ?? null) ? trim($data["title"]) : '';
+        $description = is_string($data["description"] ?? null) ? trim($data["description"]) : '';
+        $category = is_string($data["category"] ?? null) ? trim($data["category"]) : '' ;
+        $priority = is_string($data["priority"] ?? null) ? trim($data["priority"]) : '' ;
+        $status = is_string($data["status"] ?? null) ? trim($data["status"]) : '';
 
         $ticketsModel = new Tickets();
 
         //if any of the inputs are empty (which can be done via raw non-browser POST request because we have browser-side validation)
-        if (!$project_id || !$user_id || !$title || !$description || !$category || !$priority || !$status) {
+        if ($project_id === false || !$user_id || $title === '' || $description === '' || $category === '' || $priority === '' || $status === '') {
             header("Location: dashboard.php?error=error_empty_input");
+            exit();
+        }
+        //title must be <100
+        if (mb_strlen($title) > 100) {
+            header("Location: dashboard.php?error=error_too_long");
+            exit();
+        }
+
+        //if project does not exist
+        if (!(new Projects())->getProjectInfo($project_id)) {
+            header("Location: dashboard.php?error=error_invalid_project");
             exit();
         }
         
@@ -135,7 +146,14 @@ class TicketController {
         } else if ($message == "error_csrf") {
             $messageOutput = "CSRF Token failed.";
             $color = "danger";
+        } else if ($message == "error_too_long") {
+            $messageOutput = "Title must be 100 characters or less.";
+            $color = "danger";
+        } else if ($message == "error_invalid_project") {
+            $messageOutput = "The project you selected does not exist.";
+            $color = "danger";
         }
+
 
         require_once "../views/editTicket.php";
     }
@@ -145,13 +163,13 @@ class TicketController {
 
         $csrf_token = $data['csrf_token'] ?? null;
         $user_id = $_SESSION["user_id"] ?? null;
-        $ticket_id = $data["ticket_id"] ?? null;
-        $project_id = $data["project_id"] ?? null;
-        $title = $data["title"] ?? '';
-        $description = $data["description"] ?? '';
-        $category = $data["category"] ?? '';
-        $priority = $data["priority"] ?? '';
-        $status = $data["status"] ?? '';
+        $ticket_id = filter_var($data["ticket_id"] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $project_id = filter_var($data["project_id"] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $title = is_string($data["title"] ?? null) ? trim($data["title"]) : '';
+        $description = is_string($data["description"] ?? null) ? trim($data["description"]) : '';
+        $category = is_string($data["category"] ?? null) ? trim($data["category"]) : '';
+        $priority = is_string($data["priority"] ?? null) ? trim($data["priority"]) : '';
+        $status = is_string($data["status"] ?? null) ? trim($data["status"]) : '';
 
         if (!verifyCSRFtoken($csrf_token)) {
             $this->showEditTicketPage($ticket_id, "error_csrf");
@@ -170,10 +188,22 @@ class TicketController {
         
 
         //if any field is empty via raw post
-        if (!$ticket_id || !$project_id || !$title || !$description || !$category || !$priority || !$status) {
+        if ($ticket_id === false || $project_id === false || $title === '' || $description === '' || $category === '' || $priority === '' || $status === '') {
             $this->showEditTicketPage($ticket_id, "edit_error_empty");
             return;
         }
+
+        //title must be <100
+        if (mb_strlen($title) > 100) {
+            $this->showEditTicketPage($ticket_id, "error_too_long");
+            return;
+        }
+        //if project does not exist
+        if (!(new Projects())->getProjectInfo($project_id)) {
+            $this->showEditTicketPage($ticket_id, "error_invalid_project");
+            return;
+        }
+
 
         //category, priority and status must be of these options only  (again need this server side validation cuz of raw post requests)
         $allowed_categories =["Frontend", "Backend", "Database"];

@@ -35,6 +35,10 @@ class AuthenticationController {
             session_regenerate_id(true);
 
             $userInfo = $userModel->getUserInfoByEmail($email);
+            if (!$userInfo) {
+                header("Location: ../public/login.php?error=loginFailed");
+                exit();
+            }
             $_SESSION["user_id"] = $userInfo["id"];
             $_SESSION["is_admin"] = $userInfo["is_admin"];
             header("Location: ../public/dashboard.php");
@@ -141,13 +145,21 @@ class AuthenticationController {
 
         $userModel = new User();
         //is email already registered?
-        if ($userModel->alreadyRegistered($email)) {
+        $alreadyRegistered = $userModel->alreadyRegistered($email);
+        if ($alreadyRegistered === null) {
+            header("Location: ../public/signup.php?error=stmtfailed");
+            exit();
+        }
+        if ($alreadyRegistered) {
             header("Location: ../public/signup.php?error=alreadyRegistered");
             exit();
         }
-
         if ($userModel->addUser($email, $password)) {
             $userInfo = $userModel->getUserInfoByEmail($email);
+            if (!$userInfo) {
+                header("Location: ../public/login.php?error=loginFailed");
+                exit();
+            }
             $_SESSION["user_id"] = $userInfo["id"];
             $_SESSION["is_admin"] = $userInfo["is_admin"];
 
